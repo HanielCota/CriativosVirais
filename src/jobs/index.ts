@@ -32,6 +32,14 @@ export async function startWorkerJobs() {
   }
   return boss;
 }
+/**
+ * "Sync now" options: the sync-metrics queue uses the standard policy, where singletonKey
+ * alone does not deduplicate, so repeated clicks throttle to one UTMify call per integration
+ * per five-minute slot.
+ */
+export function manualSyncOptions(integrationId: string) {
+  return { singletonKey: integrationId, singletonSeconds: 300 };
+}
 let sender: Promise<PgBoss> | undefined;
 /** App instance: send-only. Queues exist once the worker has started at least once. */
 export function getJobs() {

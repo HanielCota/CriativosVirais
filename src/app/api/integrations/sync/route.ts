@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { integrations } from "@/db/schema";
 import { db } from "@/db";
 import { handle, apiTenant, json, HttpError } from "@/lib/http";
-import { getJobs } from "@/jobs";
+import { getJobs, manualSyncOptions } from "@/jobs";
 import { tenantWhere } from "@/lib/tenant-scope";
 export function POST(request: Request) {
   return handle(async () => {
@@ -17,7 +17,7 @@ export function POST(request: Request) {
     ).send(
       "sync-metrics",
       { tenantId, integrationId: row.id },
-      { singletonKey: row.id },
+      manualSyncOptions(row.id),
     );
     return json({ queued: true }, 202);
   });
