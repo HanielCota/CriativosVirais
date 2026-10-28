@@ -1,7 +1,8 @@
 import { z } from "zod";
 
 // Shared by Better Auth, sign-up and password reset, so the screens and the server enforce the same rule.
-export const minPasswordLength = 12;
+// Four is the client's choice for the free test with students (decided on 28/10/2026).
+export const minPasswordLength = 4;
 export const maxPasswordLength = 128;
 
 export const newPasswordSchema = z

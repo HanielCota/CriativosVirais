@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { LoaderCircle } from "@/components/icons";
 import { authClient } from "@/lib/auth-client";
-import { newPasswordSchema } from "@/lib/password-rules";
+import { minPasswordLength, newPasswordSchema } from "@/lib/password-rules";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
@@ -226,7 +226,7 @@ export function AuthForm({ mode, defaultEmail, inviteToken }: { mode: "login" | 
           />
           {signup && (
             <p id="password-hint" className="text-xs text-muted-foreground">
-              Pelo menos 12 caracteres.
+              Pelo menos {minPasswordLength} caracteres.
             </p>
           )}
           {fieldError("password")}
