@@ -12,8 +12,16 @@ import {
 } from "docx";
 import type { getBatch } from "./batches";
 type Batch = NonNullable<Awaited<ReturnType<typeof getBatch>>>;
-export function creativeText(item: Batch["items"][number]) {
-  return `${item.creativeKey}\n\nINSTRUÇÕES\nIdeia: ${item.ideia}\nFormato: ${item.formato}\nReferência: ${item.referencia}\nInstruções gravação: ${item.instrucoesGravacao}\nInstruções edição: ${item.instrucoesEdicao}\n\nHOOK\nG1: ${item.g1}\nG2: ${item.g2}\nG3: ${item.g3}\n\nCORPO\n${item.corpo}`;
+type Item = Batch["items"][number];
+/** Hooks labelled G1 to G4; batches generated before the fourth hook have three. */
+function hooks(item: Item) {
+  return [item.g1, item.g2, item.g3, item.g4]
+    .filter((hook) => hook != null)
+    .map((hook, index) => ({ label: `G${index + 1}`, text: hook }));
+}
+export function creativeText(item: Item) {
+  const hookLines = hooks(item).map((hook) => `${hook.label}: ${hook.text}`).join("\n");
+  return `${item.creativeKey}\n\nINSTRUÇÕES\nIdeia: ${item.ideia}\nFormato: ${item.formato}\nReferência: ${item.referencia}\nInstruções gravação: ${item.instrucoesGravacao}\nInstruções edição: ${item.instrucoesEdicao}\n\nHOOK\n${hookLines}\n\nCORPO\n${item.corpo}`;
 }
 export function batchText(batch: Batch) {
   return `${batch.title}\n${batch.produtoNome}\n${batch.especialistaHandle ? "@" + batch.especialistaHandle.replace(/^@/, "") : ""}\n\n${batch.items.map(creativeText).join("\n\n")}`;
@@ -133,7 +141,7 @@ export function batchDocument(batch: Batch) {
               row("Instruções edição", item.instrucoesEdicao),
             ]),
             heading("HOOK"),
-            table([row("G1", item.g1), row("G2", item.g2), row("G3", item.g3)]),
+            table(hooks(item).map((hook) => row(hook.label, hook.text))),
             heading("CORPO"),
             ...paragraphs(item.corpo),
           ]),

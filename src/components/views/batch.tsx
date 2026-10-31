@@ -56,6 +56,7 @@ export async function BatchView({
     g1: item.g1,
     g2: item.g2,
     g3: item.g3,
+    g4: item.g4,
     corpo: item.corpo,
     narrativa: item.narrativa,
     awarenessEntry: item.awarenessEntry,

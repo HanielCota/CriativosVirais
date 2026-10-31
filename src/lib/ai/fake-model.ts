@@ -41,6 +41,7 @@ function demoItem(position: number) {
     g1: "Você chega em casa e a semana já começou atrasada?",
     g2: "Quinze minutos no domingo mudaram a minha semana inteira.",
     g3: "O problema não é falta de tempo, é falta de bloco.",
+    g4: "Sua agenda vive cheia e a semana não anda?",
     corpo:
       "Eu vivia apagando incêndio. Aí comecei a planejar a semana em blocos de 15 minutos no domingo. Mais de 1.200 alunas já fizeram o mesmo. Clique no link e conheça o Método Rotina Leve.",
     narrativa: "Dor da rotina caótica, virada com o bloco de 15 minutos, prova e convite.",

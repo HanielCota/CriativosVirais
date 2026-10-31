@@ -111,7 +111,7 @@ Se a restauração falhar no meio, nada é desfeito: apague o banco, crie-o vazi
 
 1. Crie um recurso **Public Git Repository** com este repositório, **Build Pack** *Docker Compose* e **Docker Compose Location** `/docker-compose.coolify.yml`.
 2. Em **Domains**, informe o domínio do serviço `app` com a porta interna (`https://app.exemplo.com.br:3000`) e o do serviço `rustfs` (`https://arquivos.exemplo.com.br:9000`). Os outros serviços ficam sem domínio. Atrás da Cloudflare, o domínio do RustFS fica em "DNS only": o proxy do plano gratuito recusa envios acima de 100 MB.
-3. Em **Environment Variables**, preencha só as chaves e modelos da DeepSeek e da Groq quando forem usados, e `RESEND_API_KEY` com `EMAIL_FROM` para a recuperação de senha por e-mail. Não altere as `SERVICE_*`: trocar `SERVICE_REALBASE64_ENCRYPTION` torna as credenciais salvas ilegíveis.
+3. Em **Environment Variables**, preencha só as chaves e modelos da DeepSeek e da Groq quando forem usados, e `RESEND_API_KEY` com `EMAIL_FROM` para a recuperação de senha por e-mail. Não altere as `SERVICE_*`: trocar `SERVICE_REALBASE64_ENCRYPTION` torna as credenciais salvas ilegíveis. O método privado do cliente, quando houver, vai em `PRIVATE_METHOD_BASE64` (o Markdown em base64, que app e worker acrescentam ao documento mestre), só em runtime: desmarque *Available at Buildtime* para ele não entrar na imagem. Ele nunca vai para o repositório, e uma mudança só vale depois de reiniciar app e worker.
 4. Faça o deploy e siga a partir do passo 5 acima.
 
 A cada deploy o `migrate` roda de novo antes de app e worker. Para migrations que pedem os processos parados (veja abaixo), pare o recurso antes do deploy.

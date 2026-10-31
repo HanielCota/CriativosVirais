@@ -544,6 +544,8 @@ export const batchItems = pgTable(
     g1: text("g1").notNull(),
     g2: text("g2").notNull(),
     g3: text("g3").notNull(),
+    // Batches generated before four hooks per script have only three.
+    g4: text("g4"),
     corpo: text("corpo").notNull(),
     narrativa: text("narrativa").notNull(),
     awarenessEntry: text("awareness_entry").notNull(),

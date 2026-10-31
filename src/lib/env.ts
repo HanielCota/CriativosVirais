@@ -73,6 +73,17 @@ const schemas = {
       // "," alone would turn every purchase into "ignored" without any warning.
       .refine((ids) => ids.length > 0),
   }),
+  privateMethod: z.object({
+    // The mentor's paid method, kept only on the server. Base64 so the Markdown survives the host's
+    // variable editor; compose files pass it as "" when unset. Line breaks are dropped because
+    // `base64` wraps its output at 76 columns by default.
+    PRIVATE_METHOD_BASE64: z
+      .string()
+      .transform((v) => v.replace(/\s/g, ""))
+      .pipe(z.string().regex(/^[A-Za-z0-9+/]*={0,2}$/))
+      .optional()
+      .transform((v) => (v === "" ? undefined : v)),
+  }),
   crypto: z.object({
     ENCRYPTION_KEY: z
       .string()
@@ -119,6 +130,7 @@ export const transcribeEnv = () => optionalGroup("transcribe");
 export const emailEnv = () => optionalGroup("email");
 export const emailOutboxEnv = () => optionalGroup("emailOutbox");
 export const hotmartEnv = () => optionalGroup("hotmart");
+export const privateMethodEnv = () => group("privateMethod");
 
 const optionalProviders = {
   ai: { feature: "chat and batch generation", variables: ["DEEPSEEK_API_KEY", "DEEPSEEK_MODEL_TEXT"] },

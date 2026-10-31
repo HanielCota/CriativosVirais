@@ -1,4 +1,3 @@
-import { readFile } from "node:fs/promises";
 import { desc, eq, inArray, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db";
@@ -18,18 +17,9 @@ import {
 } from "@/db/schema";
 import { tenantWhere } from "../tenant-scope";
 import { analysisColumns } from "./analysis-columns";
+import { masterDocument } from "./master-document";
 import { assembleSystemPrompt, untrusted } from "./prompt-sections";
-export { untrusted };
-let master: Promise<string> | undefined;
-export function masterDocument() {
-  return (master ??= readFile(
-    process.cwd() + "/docs/documento-mestre.md",
-    "utf8",
-  ).catch((error) => {
-    master = undefined;
-    throw error;
-  }));
-}
+export { masterDocument, untrusted };
 /** Message metadata sent by the chat client: `{ assetIds }` of attached videos. */
 export const attachmentsSchema = z.object({
   assetIds: z.array(z.uuid().transform((id) => id.toLowerCase())).max(5),

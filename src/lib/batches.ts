@@ -4,6 +4,7 @@ import { z } from "zod";
 import { db } from "@/db";
 import { batches, batchGenerations, batchItems, clientContexts, creatives } from "@/db/schema";
 import { getJobs, jobTransaction } from "@/jobs";
+import { batchRequest } from "./ai/batch-request";
 import { batchSchema, batchItemSchema } from "./ai/schemas";
 import { textModel, providerOptions } from "./ai/model";
 import { buildSystemPrompt, untrusted } from "./ai/system-prompt";
@@ -111,7 +112,7 @@ export async function generateBatch(
     output: Output.object({ schema: batchSchema }),
     maxOutputTokens: 24000,
     instructions: system,
-    prompt: `Crie exatamente ${quantity} criativos no template. instrucoes_gravacao e instrucoes_edicao devem ser vazias salvo necessidade real. 3 hooks compatíveis com o mesmo corpo completo falado com CTA. Use somente provas autorizadas. Cada item é uma hipótese explícita.\n${untrusted("generation_request", instructions)}`,
+    prompt: `${batchRequest(quantity)}\n${untrusted("generation_request", instructions)}`,
     maxRetries: 1,
     abortSignal: deadline(180_000, signal),
   });
@@ -179,6 +180,7 @@ export async function generateBatch(
         g1: i.g1,
         g2: i.g2,
         g3: i.g3,
+        g4: i.g4,
         corpo: i.corpo,
         narrativa: i.narrativa,
         awarenessEntry: i.awareness_entry,

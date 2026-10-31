@@ -21,9 +21,9 @@ const offer = {
 };
 
 const hooks = [
-  ["Você chega em casa e a semana já começou atrasada?", "Quinze minutos no domingo mudaram a minha semana.", "O problema não é falta de tempo, é falta de bloco."],
-  ["Eu tentei todo aplicativo de agenda. Nenhum funcionou.", "A agenda que funciona cabe num papel.", "Pare de planejar o dia. Planeje a semana."],
-  ["Mãe que trabalha fora: isso é para você.", "Três blocos por dia, e a casa parou de mandar em mim.", "Por que a sua rotina quebra toda quarta-feira?"],
+  ["Você chega em casa e a semana já começou atrasada?", "Quinze minutos no domingo mudaram a minha semana.", "O problema não é falta de tempo, é falta de bloco.", "Sua agenda vive cheia e a semana não anda?"],
+  ["Eu tentei todo aplicativo de agenda. Nenhum funcionou.", "A agenda que funciona cabe num papel.", "Pare de planejar o dia. Planeje a semana.", "Três apps de agenda e nenhuma semana organizada."],
+  ["Mãe que trabalha fora: isso é para você.", "Três blocos por dia, e a casa parou de mandar em mim.", "Por que a sua rotina quebra toda quarta-feira?", "O domingo que salvou a minha segunda."],
 ];
 
 function daysAgo(days: number) {
@@ -31,7 +31,7 @@ function daysAgo(days: number) {
 }
 
 function demoItem(position: number) {
-  const [g1, g2, g3] = hooks[position - 1];
+  const [g1, g2, g3, g4] = hooks[position - 1];
   return {
     position,
     creativeKey: batchKeys[position - 1],
@@ -40,6 +40,7 @@ function demoItem(position: number) {
     g1,
     g2,
     g3,
+    g4,
     corpo: "Eu vivia apagando incêndio. Comecei a planejar a semana em blocos de 15 minutos no domingo. Mais de 1.200 alunas já fizeram o mesmo. Clique no link e conheça o Método Rotina Leve.",
     narrativa: "Dor da rotina caótica, virada com o bloco de 15 minutos, prova e convite.",
     awarenessEntry: "problem_aware",

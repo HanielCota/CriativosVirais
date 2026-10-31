@@ -20,6 +20,7 @@ export type Script = {
   g1: string;
   g2: string;
   g3: string;
+  g4: string | null;
   corpo: string;
   narrativa: string;
   awarenessEntry: string;
@@ -63,7 +64,7 @@ function ScriptDetail({
   showTitle?: boolean;
 }) {
   const titleId = useId();
-  const hooks = [script.g1, script.g2, script.g3];
+  const hooks = [script.g1, script.g2, script.g3, script.g4].filter((hook) => hook != null);
   const instructions = [
     { title: "Como gravar", text: script.instrucoesGravacao },
     { title: "Como editar", text: script.instrucoesEdicao },
