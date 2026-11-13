@@ -1,5 +1,5 @@
 "use client";
-import { useId, useRef, useState } from "react";
+import { useId, useState } from "react";
 import { ChevronDown, Clock } from "@/components/icons";
 import { CopyButton } from "@/components/copy-button";
 import {
@@ -218,95 +218,21 @@ function ScriptDetail({
 }
 
 /**
- * Scripts of a leva. From `lg` up: a list on the left and the chosen script on
- * the right. Below `lg`: an accordion with one script open at a time.
+ * Scripts of a leva as a list that starts all closed, so the client sees every script at once;
+ * one script opens at a time.
  */
 export function ScriptBrowser({ scripts }: { scripts: Script[] }) {
-  const [selectedId, setSelectedId] = useState(scripts[0]?.id);
-  const [openId, setOpenId] = useState<string | null>(scripts[0]?.id ?? null);
-  const navRef = useRef<HTMLOListElement>(null);
-  const detailRef = useRef<HTMLDivElement>(null);
-  const selected =
-    scripts.find((script) => script.id === selectedId) ?? scripts[0];
-  if (!selected) return null;
-
-  function select(id: string) {
-    setSelectedId(id);
-    // Long scripts: bring the top of the new one back into view.
-    if ((detailRef.current?.getBoundingClientRect().top ?? 0) < 0)
-      detailRef.current?.scrollIntoView({ block: "start" });
-  }
-
-  function onNavKey(event: React.KeyboardEvent, index: number) {
-    const step =
-      event.key === "ArrowDown" ? 1 : event.key === "ArrowUp" ? -1 : 0;
-    if (!step) return;
-    event.preventDefault();
-    const next = scripts[(index + step + scripts.length) % scripts.length];
-    if (!next) return;
-    select(next.id);
-    navRef.current
-      ?.querySelector<HTMLButtonElement>(`[data-script="${next.id}"]`)
-      ?.focus();
-  }
+  const [openId, setOpenId] = useState<string | null>(null);
+  if (scripts.length === 0) return null;
 
   return (
     <>
-      <div className="hidden gap-6 lg:grid lg:grid-cols-[17rem_minmax(0,1fr)]">
-        <nav
-          aria-label="Roteiros da leva"
-          className="sticky top-8 -m-1 max-h-[calc(100dvh-8rem)] self-start overflow-y-auto overscroll-contain p-1"
-        >
-          <ol ref={navRef} className="space-y-1">
-            {scripts.map((script, index) => {
-              const active = script.id === selected.id;
-              return (
-                <li key={script.id}>
-                  <button
-                    type="button"
-                    data-script={script.id}
-                    aria-current={active ? "true" : undefined}
-                    aria-controls="script-detail"
-                    onClick={() => select(script.id)}
-                    onKeyDown={(event) => onNavKey(event, index)}
-                    className={cn(
-                      "flex w-full flex-col gap-1 rounded-lg border border-transparent px-3 py-2.5 text-left transition-colors duration-(--duration-fast) outline-none hover:bg-muted/60 focus-visible:ring-3 focus-visible:ring-ring/70",
-                      active && "border-border bg-card hover:bg-card",
-                    )}
-                  >
-                    <span className="text-xs font-medium text-muted-foreground">
-                      Roteiro {index + 1}
-                    </span>
-                    <span
-                      className={cn(
-                        "line-clamp-2 text-sm",
-                        !active && "text-muted-foreground",
-                      )}
-                    >
-                      {script.ideia}
-                    </span>
-                  </button>
-                </li>
-              );
-            })}
-          </ol>
-        </nav>
-        <div
-          id="script-detail"
-          ref={detailRef}
-          className="min-w-0 rounded-xl border bg-card"
-        >
-          <ScriptDetail
-            key={selected.id}
-            script={selected}
-            number={scripts.indexOf(selected) + 1}
-          />
-        </div>
-      </div>
-
+      <p className="mb-3 text-sm text-muted-foreground">
+        Abra um roteiro para ver os ganchos e o texto.
+      </p>
       <ol
         aria-label="Roteiros da leva"
-        className="divide-y overflow-hidden rounded-xl border bg-card lg:hidden"
+        className="divide-y overflow-hidden rounded-xl border bg-card"
       >
         {scripts.map((script, index) => (
           <li key={script.id}>
@@ -314,10 +240,10 @@ export function ScriptBrowser({ scripts }: { scripts: Script[] }) {
               open={openId === script.id}
               onOpenChange={(open) => setOpenId(open ? script.id : null)}
             >
-              <CollapsibleTrigger className="group/script flex w-full items-start gap-3 px-4 py-3.5 text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/70 focus-visible:ring-inset data-panel-open:bg-muted/40">
+              <CollapsibleTrigger className="group/script flex w-full items-start gap-3 px-4 py-3.5 text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/70 focus-visible:ring-inset data-panel-open:bg-muted/40 sm:px-5">
                 <span className="flex min-w-0 flex-1 flex-col gap-1">
                   <span className="text-xs font-medium text-muted-foreground">
-                    Roteiro {index + 1}
+                    Roteiro {index + 1} · ~{script.duracaoEstimada} s
                   </span>
                   <span className="line-clamp-2 text-sm font-medium group-data-panel-open/script:line-clamp-none">
                     {script.ideia}

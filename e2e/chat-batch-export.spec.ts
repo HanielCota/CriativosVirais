@@ -7,10 +7,12 @@ test("signup, chat, batch and .docx export", async ({ page }) => {
   const { batchLink } = await createBatchThroughChat(page);
 
   await batchLink.click();
-  // Only the first script opens expanded; the second shows its title.
-  await expect(page.getByText("L01-C01").first()).toBeVisible();
+  // Every script starts closed with its title; clicking one opens it.
   await expect(page.getByText(/Roteiro de teste 1/).first()).toBeVisible();
   await expect(page.getByText(/Roteiro de teste 2/).first()).toBeVisible();
+  await expect(page.getByText("L01-C01")).toBeHidden();
+  await page.getByText(/Roteiro de teste 1/).first().click();
+  await expect(page.getByText("L01-C01").first()).toBeVisible();
 
   // Measure the real dialog after Tailwind and SheetContent have applied their styles.
   // Include both sides of each breakpoint so tablet and desktop widths stay intact.

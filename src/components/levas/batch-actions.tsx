@@ -41,14 +41,15 @@ export function BatchActions({
         <DropdownMenuTrigger
           render={
             <Button
-              variant="ghost"
-              size="icon-sm"
+              variant="outline"
+              size="sm"
               aria-label="Mais ações da leva"
-              className="text-muted-foreground"
+              className="min-h-11 sm:min-h-8 sm:pointer-coarse:min-h-10"
             />
           }
         >
           <Ellipsis aria-hidden />
+          Mais
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-44">
           <DropdownMenuItem onClick={() => setDialog("rename")}>

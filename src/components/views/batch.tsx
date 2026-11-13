@@ -16,6 +16,7 @@ import { requireTenant } from "@/lib/tenant";
 import { getBatch } from "@/lib/batches";
 import { spDayBr } from "@/lib/dates";
 import { batchText, creativeText } from "@/lib/export";
+import { cn } from "@/lib/utils";
 
 export async function BatchView({
   params,
@@ -101,8 +102,9 @@ export async function BatchView({
                 className="text-muted-foreground"
                 text={batchText(batch)}
               />
+              {/* On phones the download takes its own row, and "Copiar leva" and "Mais" share the next one. */}
               <a
-                className={buttonVariants()}
+                className={cn(buttonVariants(), "max-sm:order-first max-sm:w-full")}
                 href={`/api/export/batch/${batch.id}`}
               >
                 <Download aria-hidden />
