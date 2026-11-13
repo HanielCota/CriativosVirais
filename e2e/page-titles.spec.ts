@@ -4,7 +4,7 @@ import { signUp } from "./support";
 // Every tab used to read "Criativos Virais"; each page now names itself so tabs and history differ.
 test("pages name themselves in the tab title", async ({ page }) => {
   await page.goto("/login");
-  await expect(page).toHaveTitle("Entrar · Criativos Virais");
+  await expect(page).toHaveTitle("Prisciane Pereira · Criativos Virais");
   await page.goto("/signup");
   await expect(page).toHaveTitle("Criar conta · Criativos Virais");
 

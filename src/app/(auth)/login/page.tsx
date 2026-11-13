@@ -6,7 +6,7 @@ import { staffRoleLabel } from "@/lib/staff";
 import { teamInviteTokenSchema } from "@/lib/team-invite-token";
 import { teamInviteRole } from "@/lib/team-invites";
 
-export const metadata: Metadata = { title: "Entrar" };
+export const metadata: Metadata = { title: "Prisciane Pereira" };
 
 const invitedEmail = z.email().max(254);
 
