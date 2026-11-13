@@ -14,6 +14,8 @@ async function emailsTo(email: string) {
 }
 
 test("support enters a client's account without the password, changes its email and password from the panel, and the owner manages the team", async ({ page, browser, baseURL }) => {
+  // Seven steps across three browser contexts: about 3 minutes even when it passes, so the default budget runs out on a loaded machine.
+  test.slow();
   // A client with a findable name, and a support member who already turned on two-factor.
   const clientEmail = `cliente-${randomUUID()}@exemplo.test`;
   const clientName = `Cliente ${randomUUID().slice(0, 8)}`;
@@ -111,11 +113,19 @@ test("support enters a client's account without the password, changes its email 
   // 4. Leaving puts the support member's own session back in the panel.
   await page.goto("/chat");
   await expect(page).toHaveURL(/\/chat\/[0-9a-f-]{36}$/);
-  // Retried until the banner is hydrated; a click before that does nothing.
+  // Retried only until the banner is hydrated, which is when the click sends the request. Clicking
+  // again after that would hit a disabled button or a page already navigating away.
   await expect(async () => {
-    await banner.getByRole("button", { name: "Sair da conta" }).click();
-    await expect(page).toHaveURL(/\/admin\?aba=contas$/, { timeout: 3_000 });
+    await Promise.all([
+      page.waitForRequest(
+        (request) => request.method() === "DELETE" && new URL(request.url()).pathname === "/api/support-visit",
+        { timeout: 3_000 },
+      ),
+      banner.getByRole("button", { name: "Sair da conta" }).click(),
+    ]);
   }).toPass({ timeout: 20_000 });
+  // The first visit to the panel route can take a while on a loaded dev server.
+  await expect(page).toHaveURL(/\/admin\?aba=contas$/, { timeout: 30_000 });
   await expect(page.getByRole("heading", { name: "Painel do suporte" })).toBeVisible();
   const left = await testDatabase(`select 1 from admin_audit_log where action = 'account.left' and target_email = $1`, [clientEmail]);
   expect(left).toHaveLength(1);
