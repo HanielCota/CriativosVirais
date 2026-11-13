@@ -210,17 +210,7 @@ export function AuthForm({ mode, defaultEmail, inviteToken }: { mode: "login" | 
           {fieldError("email")}
         </div>
         <div className="space-y-2">
-          <div className="flex items-center justify-between gap-3">
-            <Label htmlFor="password">Senha</Label>
-            {!signup && (
-              <Link
-                href="/recuperar-senha"
-                className="rounded-sm text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground pointer-coarse:py-2"
-              >
-                Esqueceu a senha?
-              </Link>
-            )}
-          </div>
+          <Label htmlFor="password">Senha</Label>
           <PasswordInput
             className="min-h-11"
             id="password"
@@ -242,6 +232,16 @@ export function AuthForm({ mode, defaultEmail, inviteToken }: { mode: "login" | 
             </p>
           )}
           {fieldError("password")}
+          {!signup && (
+            <div className="flex justify-end">
+              <Link
+                href="/recuperar-senha"
+                className="rounded-sm text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground pointer-coarse:py-2"
+              >
+                Esqueceu a senha?
+              </Link>
+            </div>
+          )}
         </div>
         {formError && (
           <Alert variant="destructive">
