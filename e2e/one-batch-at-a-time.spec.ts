@@ -6,7 +6,7 @@ test("an account waits for its batch in progress before the next one is queued",
   const email = `e2e-${randomUUID()}@exemplo.test`;
   await signUp(page, email);
   await sendMessage(page, "Eu vendo um curso de rotina para mães que trabalham fora.");
-  await page.getByRole("button", { name: "Confirmar e salvar" }).click();
+  await page.getByRole("button", { name: "Sim, está certo" }).click();
   await expect(page.getByText(/Confirmado em/)).toBeVisible();
 
   const conversationId = page.url().match(/\/chat\/([0-9a-f-]{36})/)?.[1];

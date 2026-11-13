@@ -12,13 +12,36 @@ import { cn } from "@/lib/utils";
 type OfferProposal = z.infer<typeof offerProposalSchema>;
 type CardState = "checking" | "pending" | "saving" | "confirmed" | "dismissed" | "replaced";
 
-const headings: Record<CardState, string> = {
-  checking: "Confira antes de eu usar nos roteiros",
-  pending: "Confira antes de eu usar nos roteiros",
-  saving: "Confira antes de eu usar nos roteiros",
-  confirmed: "Preço e provas salvos na sua oferta",
-  dismissed: "Preço e provas que você não usou",
-  replaced: "Preço e provas de antes",
+type Contents = "price" | "proofs" | "both";
+
+// A card that only carries the price must not speak of proofs, or the client wonders which proofs.
+function contentsOf(proposal: OfferProposal): Contents {
+  if (proposal.provasAutorizadas === undefined) return "price";
+  if (proposal.ticketCents === undefined) return "proofs";
+  return "both";
+}
+
+const headings: Record<CardState, Record<Contents, string>> = {
+  checking: { price: "Esse preço está certo?", proofs: "Esses dados estão certos?", both: "Esses dados estão certos?" },
+  pending: { price: "Esse preço está certo?", proofs: "Esses dados estão certos?", both: "Esses dados estão certos?" },
+  saving: { price: "Esse preço está certo?", proofs: "Esses dados estão certos?", both: "Esses dados estão certos?" },
+  confirmed: {
+    price: "Preço salvo na sua oferta",
+    proofs: "Provas salvas na sua oferta",
+    both: "Preço e provas salvos na sua oferta",
+  },
+  dismissed: {
+    price: "Preço que você não usou",
+    proofs: "Provas que você não usou",
+    both: "Preço e provas que você não usou",
+  },
+  replaced: { price: "Preço de antes", proofs: "Provas de antes", both: "Preço e provas de antes" },
+};
+
+const correctionRequests: Record<Contents, string> = {
+  price: "Não salvei. Me diga o preço certo na conversa.",
+  proofs: "Não salvei. Me diga as provas certas na conversa.",
+  both: "Não salvei. Me diga o preço e as provas certas na conversa.",
 };
 
 function StatusBadge({ state, confirmedOn }: { state: CardState; confirmedOn: string | null }) {
@@ -133,6 +156,7 @@ export function OfferProposalCard({
   }
 
   const proofs = proposal.provasAutorizadas;
+  const contents = contentsOf(proposal);
   // The buttons show while checking too: a card that grew after the reply ended left the chat above the bottom.
   const waiting = state === "checking" || state === "pending" || state === "saving";
   return (
@@ -145,7 +169,7 @@ export function OfferProposalCard({
           <StatusBadge state={state} confirmedOn={confirmedOn} />
         </p>
         <h4 id={titleId} className="text-sm font-semibold">
-          {headings[state]}
+          {headings[state][contents]}
         </h4>
         {state === "replaced" ? (
           <p className="text-sm text-muted-foreground">
@@ -154,7 +178,7 @@ export function OfferProposalCard({
         ) : null}
         {state === "confirmed" || state === "replaced" || state === "dismissed" ? null : (
           <p className="text-sm text-muted-foreground">
-            Prova e preço aparecem no anúncio. Só uso o que você confirmar.
+            Vou usar isso nos seus anúncios.
           </p>
         )}
       </div>
@@ -185,32 +209,27 @@ export function OfferProposalCard({
         </div>
       )}
       {waiting ? (
-        <>
-          <div className="flex flex-col gap-2.5 sm:flex-row">
-            <Button
-              size="lg"
-              disabled={state !== "pending"}
-              onClick={() => void confirm()}
-            >
-              {state === "saving" ? "Salvando..." : "Confirmar e salvar"}
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              disabled={state !== "pending"}
-              onClick={dismiss}
-            >
-              Não usar
-            </Button>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            Algo errado? Toque em &quot;Não usar&quot; e me diga o certo na conversa.
-          </p>
-        </>
+        <div className="flex flex-col gap-2.5 sm:flex-row">
+          <Button
+            size="lg"
+            disabled={state !== "pending"}
+            onClick={() => void confirm()}
+          >
+            {state === "saving" ? "Salvando..." : "Sim, está certo"}
+          </Button>
+          <Button
+            size="lg"
+            variant="outline"
+            disabled={state !== "pending"}
+            onClick={dismiss}
+          >
+            Não, quero corrigir
+          </Button>
+        </div>
       ) : null}
       {state === "dismissed" ? (
         <p className="text-sm text-muted-foreground">
-          Não salvei. Me diga o preço e as provas certas na conversa.
+          {correctionRequests[contents]}
         </p>
       ) : null}
       {state === "confirmed" ? (

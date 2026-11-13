@@ -3,8 +3,8 @@ import { MockLanguageModelV4 } from "ai/test";
 
 // Deterministic stand-in for the text model, enabled only by AI_PROVIDER=fake outside
 // production (src/lib/env.ts). It never touches the network and follows a fixed script:
-// a message about the offer saves a demo context, a message asking for a "leva" generates
-// two demo scripts, anything else gets a short reply. Structured calls (batch, quality
+// a message about the offer saves a demo context, "só o preço" proposes only a new price,
+// a message asking for a "leva" generates two demo scripts, anything else gets a short reply. Structured calls (batch, quality
 // review, item regeneration) are answered from the requested JSON schema.
 
 type CallOptions = Parameters<MockLanguageModelV4["doGenerate"]>[0];
@@ -115,7 +115,7 @@ function replyAfterTool(message: PromptMessage) {
   if (result.toolName === "updateClientContext")
     return failed
       ? `${label} Não consegui salvar a sua oferta. Tente de novo.`
-      : `${label} Anotei a sua oferta. Confira o preço e as provas no cartão e toque em Confirmar; depois peça: gere uma leva.`;
+      : `${label} Anotei a sua oferta. Confira o preço e as provas no cartão e toque em Sim, está certo; depois peça: gere uma leva.`;
   return `${label} Pronto.`;
 }
 
@@ -126,6 +126,8 @@ function chatAnswer(options: CallOptions): StreamPart[] {
   const tools = new Set((options.tools ?? []).map((entry) => entry.name));
   if (/\bleva\b/i.test(text) && tools.has("generateBatch"))
     return toolCallParts("generateBatch", { quantidade: 2, instrucoes: text.slice(0, 6000) });
+  if (/só o preço/i.test(text) && tools.has("updateClientContext"))
+    return toolCallParts("updateClientContext", { ticketCents: "29700" });
   if (/\b(vendo|produto|oferta)\b/i.test(text) && tools.has("updateClientContext"))
     return toolCallParts("updateClientContext", demoContext);
   return textParts(`${label} Recebi a sua mensagem. Conte o que você vende ou peça: gere uma leva.`);

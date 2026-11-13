@@ -68,7 +68,7 @@ export async function sendMessage(page: Page, text: string) {
 export async function createBatchThroughChat(page: Page) {
   await sendMessage(page, "Eu vendo um curso de rotina para mães que trabalham fora.");
   await expect(page.getByRole("link", { name: /Anotei na sua oferta/ })).toBeVisible();
-  await page.getByRole("button", { name: "Confirmar e salvar" }).click();
+  await page.getByRole("button", { name: "Sim, está certo" }).click();
   await expect(page.getByText(/Confirmado em/)).toBeVisible();
   await sendMessage(page, "Gere uma leva com dois roteiros.");
   const batchLink = page.getByRole("link", { name: /Abrir leva de roteiros/ });
