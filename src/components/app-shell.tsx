@@ -67,6 +67,9 @@ type Conversation = { id: string; title: string; createdAt: Date };
 
 const quietButton =
   "text-muted-foreground hover:bg-accent hover:text-foreground";
+/** Top bar items name what they do: the word sits under the icon on phones and beside it on wider screens. */
+const barItem =
+  "h-11 min-w-11 shrink-0 flex-col gap-0.5 px-1 py-0.5 text-[11px] leading-none sm:h-9 sm:min-w-0 sm:flex-row sm:gap-1.5 sm:px-3 sm:py-1.5 sm:text-sm sm:leading-normal sm:pointer-coarse:h-11";
 
 /** Rows sit inside clipped scroll areas, so their focus outline is inset. */
 const rowFocus =
@@ -144,7 +147,7 @@ export function AppShell({
       {banner}
       <header
         data-print="hide"
-        className="sticky top-0 z-30 flex h-[calc(3.5rem+env(safe-area-inset-top))] shrink-0 items-center gap-1 bg-background/85 px-2 pt-[env(safe-area-inset-top)] backdrop-blur-md sm:px-4"
+        className="sticky top-0 z-30 flex h-[calc(3.5rem+env(safe-area-inset-top))] shrink-0 items-center gap-0.5 bg-background/85 px-2 pt-[env(safe-area-inset-top)] backdrop-blur-md sm:gap-1 sm:px-4"
       >
         <Link
           href="/chat"
@@ -162,16 +165,16 @@ export function AppShell({
         </p>
         {showAdminLink && <AdminShortcut />}
         <PlaceShortcuts />
-        <NewConversationButton />
+        <NewConversationButton labelled />
         <Hint label="Histórico (Ctrl K)">
           <Button
             variant="ghost"
-            size="icon"
             aria-label="Abrir histórico de conversas"
-              className={quietButton}
+            className={cn(quietButton, barItem)}
             onClick={() => setHistoryOpen(true)}
           >
             <History aria-hidden className="size-5" />
+            Histórico
           </Button>
         </Hint>
         <UserMenu user={user} supportVisit={Boolean(banner)} />
@@ -291,16 +294,17 @@ function AdminShortcut() {
       className={cn(
         buttonVariants({ variant: "ghost" }),
         quietButton,
-        "size-9 shrink-0 px-0 pointer-coarse:size-11 sm:size-auto sm:px-3 sm:pointer-coarse:size-auto",
+        barItem,
       )}
     >
       <ShieldCheck aria-hidden className="size-5" />
-      <span className="sr-only sm:not-sr-only">Painel Admin</span>
+      <span className="sm:hidden">Admin</span>
+      <span className="hidden sm:inline">Painel Admin</span>
     </Link>
   );
 }
 
-/** Levas and Resultados one click away: labelled on wider screens, icons on phones. */
+/** Levas and Resultados one click away, always with their names. */
 function PlaceShortcuts() {
   const pathname = usePathname();
   return (
@@ -315,12 +319,12 @@ function PlaceShortcuts() {
             className={cn(
               buttonVariants({ variant: "ghost" }),
               quietButton,
-              "size-9 px-0 pointer-coarse:size-11 sm:size-auto sm:px-3 sm:pointer-coarse:size-auto",
+              barItem,
               active && "bg-accent text-foreground",
             )}
           >
             <Icon aria-hidden weight={active ? "fill" : "duotone"} className="size-5" />
-            <span className="sr-only sm:not-sr-only">{label}</span>
+            {label}
           </Link>
         );
       })}
@@ -355,24 +359,33 @@ function NewConversationButton({
   hintSide = "bottom",
   onNavigate,
   className,
+  labelled = false,
 }: {
   hintSide?: "bottom" | "right";
   onNavigate?: () => void;
   className?: string;
+  /** Shows the name beside the icon, as in the top bar. */
+  labelled?: boolean;
 }) {
   const { create, pending } = useNewConversation(onNavigate);
   return (
-    <Hint label="Nova conversa" side={hintSide}>
+    <Hint label="Nova conversa" side={hintSide} disabled={labelled}>
       <Button
         variant="ghost"
-        size="icon"
+        size={labelled ? "default" : "icon"}
         onClick={create}
         disabled={pending}
         aria-busy={pending}
         aria-label={pending ? "Criando conversa" : "Nova conversa"}
-        className={cn(quietButton, className)}
+        className={cn(quietButton, labelled && barItem, className)}
       >
         <SquarePen aria-hidden className="size-5" />
+        {labelled ? (
+          <>
+            <span className="sm:hidden">Nova</span>
+            <span className="hidden sm:inline">Nova conversa</span>
+          </>
+        ) : null}
       </Button>
     </Hint>
   );
@@ -601,18 +614,19 @@ function UserMenu({ user, supportVisit }: { user: User; supportVisit: boolean })
         render={
           <Button
             variant="ghost"
-            size="icon"
-            aria-label={`Conta de ${user.name}`}
-            className="ml-1 rounded-full"
+            aria-label={`Minha conta, ${user.name}`}
+            className={cn(quietButton, barItem, "sm:ml-1 sm:py-0.5 sm:pl-1")}
           />
         }
       >
-        <Avatar aria-hidden className="size-8">
+        <Avatar aria-hidden className="size-6 sm:size-8">
           {user.image && <AvatarImage src={user.image} alt="" />}
           <AvatarFallback className="bg-primary text-xs font-semibold text-primary-foreground">
             {initial}
           </AvatarFallback>
         </Avatar>
+        <span className="sm:hidden">Conta</span>
+        <span className="hidden sm:inline">Minha conta</span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" sideOffset={6} className="w-64 p-1">
         <div className="px-2.5 pt-2 pb-2.5">
